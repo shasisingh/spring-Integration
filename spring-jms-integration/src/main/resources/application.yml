@@ -1,0 +1,9 @@
+logging:
+  level:
+    org:
+      apache:
+        commons: INFO
+      springframework:
+        integration: INFO
+    io:
+     netty: INFO

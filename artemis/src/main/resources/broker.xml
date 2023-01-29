@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:activemq"
+               xsi:schemaLocation="urn:activemq /schema/artemis-configuration.xsd">
+    <core xmlns="urn:activemq:core">
+        <persistence-enabled>false</persistence-enabled>
+        <security-enabled>false</security-enabled>
+        <graceful-shutdown-enabled>true</graceful-shutdown-enabled>
+        <acceptors>
+            <acceptor name="in-vm">vm://0</acceptor>
+            <acceptor name="netty-acceptor">tcp://localhost:61616</acceptor>
+        </acceptors>
+        <address-settings>
+            <address-setting match="*">
+                <dead-letter-address>deadLetterQueue</dead-letter-address>
+                <max-delivery-attempts>3</max-delivery-attempts>
+                <expiry-address>jms.queue.expiryQueue</expiry-address>
+                <redelivery-delay-multiplier>1.5</redelivery-delay-multiplier>
+                <redelivery-delay>5000</redelivery-delay>
+                <redelivery-collision-avoidance-factor>0.15</redelivery-collision-avoidance-factor>
+                <max-redelivery-delay>50000</max-redelivery-delay>
+                <auto-create-dead-letter-resources>true</auto-create-dead-letter-resources>
+            </address-setting>
+        </address-settings>
+        <addresses>
+            <address name="closeAccountListQueue">
+                <anycast>
+                    <queue name="closeAccountListQueue"/>
+                </anycast>
+            </address>
+
+            <address name="closeAccountNotification">
+                <anycast>
+                    <queue name="closeAccountNotification"/>
+                </anycast>
+            </address>
+        </addresses>
+    </core>
+</configuration>
