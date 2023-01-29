@@ -23,6 +23,16 @@ public class WriteMessage {
                 throw new RuntimeException(e);
             }
         });
+
+        IntStream.range(1, 100).forEach(counter -> {
+            try {
+                JmsClient.send(counter + "==>" + testMessage(), "newAccountQueue");
+            } catch (JMSException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
     }
 
     private static String testMessage() {

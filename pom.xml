@@ -13,7 +13,7 @@
     </parent>
 
     <groupId>nl.shashi.playground</groupId>
-    <artifactId>spring-integration</artifactId>
+    <artifactId>spring-integration-root</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -28,8 +28,14 @@
     <properties>
         <java.version>11</java.version>
         <spring-boot-starter.version>2.7.8</spring-boot-starter.version>
-        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
-
+        <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <maven-clean-plugin.version>2.5</maven-clean-plugin.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>11</java.version>
+        <skipTests>false</skipTests>
+        <argLine>-Duser.language=en -Duser.region=US</argLine>
     </properties>
     <dependencies>
 
@@ -57,8 +63,33 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${exec-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                            <configuration>
+                                <classifier>exec</classifier>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

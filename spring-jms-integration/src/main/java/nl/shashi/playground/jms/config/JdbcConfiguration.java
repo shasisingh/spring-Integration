@@ -1,6 +1,6 @@
 package nl.shashi.playground.jms.config;
 
-import nl.shashi.playground.jms.service.RetryFileHandler;
+import nl.shashi.playground.jms.service.handler.RetryFileHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.core.MessageSource;
@@ -29,10 +29,7 @@ public class JdbcConfiguration {
                 .handle(retryFileHandler).get();
     }
 
-    @Bean
-    public RetryFileHandler retryFileHandler(DataSource dataSource) {
-        return new RetryFileHandler(dataSource);
-    }
+
 
     @Bean
     public MessageSource<Object> jdbcRetryChannel(DataSource dataSource) {

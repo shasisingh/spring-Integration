@@ -11,7 +11,7 @@ import org.springframework.integration.config.EnableIntegration;
 public class JmsApplication {
 
     public static void main(String[] args) throws Exception {
-        RunArtemis.kick();
+//        RunArtemis.kick();
         SpringApplication.run(JmsApplication.class, args);
     }
 }

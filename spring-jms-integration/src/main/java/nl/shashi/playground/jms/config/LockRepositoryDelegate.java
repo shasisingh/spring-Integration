@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(transactionManager = "jpaTransactionManager")
 public class LockRepositoryDelegate implements LockRepository, InitializingBean {
+
     private final DefaultLockRepository defaultLockRepository;
 
     public LockRepositoryDelegate(DefaultLockRepository defaultLockRepository) {

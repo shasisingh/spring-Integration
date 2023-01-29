@@ -1,6 +1,6 @@
 package nl.shashi.playground.jms.config;
 
-import nl.shashi.playground.jms.service.JmsMessageHandler;
+import nl.shashi.playground.jms.service.handler.JmsMessageHandler;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +24,7 @@ import static org.springframework.integration.dsl.Pollers.fixedDelay;
 @Configuration
 public class JmsConfiguration {
 
+    public static final String LEADER_ROLE = "leader";
 
     @Value("${activemq.broker-urls:tcp://localhost:61616}")
     private String brokerUrl;
@@ -33,8 +34,8 @@ public class JmsConfiguration {
     public IntegrationFlow queueRetryHandler(MessageSource<Object> jmsRetrySource, JmsMessageHandler messageHandler,
             JmsTransactionManager jmsTransactionManager) {
         return IntegrationFlows
-                .from(jmsRetrySource, configurer -> configurer
-                        .autoStartup(true)
+                .from(jmsRetrySource, configurer -> configurer.role(LEADER_ROLE)
+                        .autoStartup(false)
                         .poller(fixedDelay(1000, TimeUnit.MILLISECONDS)
                                 .receiveTimeout(1000L)
                                 .maxMessagesPerPoll(5)
@@ -50,8 +51,8 @@ public class JmsConfiguration {
     public IntegrationFlow flow(ConnectionFactory connectionFactory, JmsTransactionManager jmsTransactionManager) {
         return IntegrationFlows
                 .from(Jms.inboundAdapter(getJmsTemplate(connectionFactory,"closeAccountListQueue")),
-                        configurer -> configurer
-                                .autoStartup(true)
+                        configurer -> configurer.role(LEADER_ROLE)
+                                .autoStartup(false)
                                 .poller(
                                         Pollers.fixedDelay(10).maxMessagesPerPoll(2).transactional(jmsTransactionManager))
                 )
@@ -70,9 +71,9 @@ public class JmsConfiguration {
         return messageSource;
     }
 
-    @Bean("closeAccountList")
+    @Bean("newAccountQueue")
     public JmsTemplate queueToLook(ConnectionFactory connectionFactory) {
-        return getJmsTemplate(connectionFactory, "closeAccountListQueue");
+        return getJmsTemplate(connectionFactory, "newAccountQueue");
     }
 
     @Bean("jmsTransactionManager")

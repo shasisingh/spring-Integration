@@ -33,6 +33,12 @@
                     <queue name="closeAccountNotification"/>
                 </anycast>
             </address>
+
+            <address name="newAccountQueue">
+                <anycast>
+                    <queue name="newAccountQueue"/>
+                </anycast>
+            </address>
         </addresses>
     </core>
 </configuration>
