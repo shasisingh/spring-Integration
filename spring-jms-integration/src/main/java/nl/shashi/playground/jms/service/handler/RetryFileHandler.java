@@ -1,5 +1,6 @@
 package nl.shashi.playground.jms.service.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.shashi.playground.jms.service.LeaderCandidate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class RetryFileHandler implements MessageHandler {
 
     private final LeaderCandidate leaderCandidate;
@@ -27,16 +29,16 @@ public class RetryFileHandler implements MessageHandler {
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
         if (!leaderCandidate.isLeader()) {
-            throw new MessagingException("Cannot handle the message because the service is not the leader");
+            log.warn("Cannot handle the message because the current service is not the leader");
+            throw new MessagingException("Cannot handle the message because the current service is not the leader");
         }
         List<Map<String, String>> retryMessagePayload = (List<Map<String, String>>) message.getPayload();
 
         for (Map<String, String> payload : retryMessagePayload) {
             String sourceDirectory = payload.get("SOURCE_DIR");
             String fileScanUUID = payload.get("FILE_UUID");
-            System.out.println(fileScanUUID + sourceDirectory);
             retryMetaDataCleanup(fileScanUUID);
-            System.out.println("Consumed Jdbc Message");
+            log.info("Consumed Jdbc Message, message :{},dir:{} ", fileScanUUID, sourceDirectory);
         }
     }
 
@@ -46,7 +48,7 @@ public class RetryFileHandler implements MessageHandler {
             preparedStatement.setString(1, fileScanUUID);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("retryFileHandler:retry: Error while deleting to database");
+            log.error("retryFileHandler:retry: Error while deleting to database error: {1}",e);
         }
     }
 

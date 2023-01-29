@@ -1,5 +1,6 @@
 package nl.shashi.playground.jms.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -17,6 +18,7 @@ import java.util.UUID;
  */
 
 @Configuration
+@Slf4j
 public class ErrorChannelConfig {
 
 
@@ -38,16 +40,16 @@ public class ErrorChannelConfig {
                 .map(Message::getHeaders)
                 .map(MessageHeaders::getId)
                 .map(UUID::toString)
-                .orElse("fileUUID could not be found");
+                .orElse("UUID NOT FOUND");
 
-        System.out.println("Payload"+ uuid);
+        log.warn("errorHandler: Received interrupted error from handler {uniqueId:{}}",uuid);
 
         String payload = Optional.ofNullable(message)
                 .map(Message::getPayload)
                 .map(Object::toString)
-                .orElse("no payload");
+                .orElse("NO PAYLOAD");
 
-        System.out.println("Payload"+ payload);
+        log.warn("errorHandler: Received interrupted error from handler {payload:{}}",payload);
     }
 
 }

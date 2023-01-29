@@ -35,7 +35,7 @@ public class LeaderConfiguration {
     @Bean
     public LockRepository lockRepository(DataSource dataSource) {
         var defaultLockRepository = new DefaultLockRepository(dataSource);
-        defaultLockRepository.setPrefix("SHASHI_LEADER_");
+        defaultLockRepository.setPrefix("APPS_LEADER_");
         return new LockRepositoryDelegate(defaultLockRepository);
 
     }

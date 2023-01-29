@@ -16,19 +16,19 @@ import java.util.concurrent.TimeUnit;
 public class JdbcConfiguration {
 
     public static final String LEADER_ROLE = "leader";
+    private static final int FIX_DELAY_IN_SEC = 10;
+    private static final int MAX_MESSAGES_PER_POLL = 10;
 
     @Bean
-    public IntegrationFlow retryPoller(MessageSource<Object> jdbcRetryChannel, RetryFileHandler retryFileHandler) {
+    public IntegrationFlow jdbcPoller(MessageSource<Object> jdbcRetryChannel, RetryFileHandler retryFileHandler) {
         return IntegrationFlows.from(jdbcRetryChannel,
                         configurer ->
                                 configurer.role(LEADER_ROLE)
-                                        .autoStartup(true)
-                                        .poller(Pollers.fixedDelay(10, TimeUnit.SECONDS)
-                                                .maxMessagesPerPoll(10)))
-                .log()
+                                        .autoStartup(false)
+                                        .poller(Pollers.fixedDelay(FIX_DELAY_IN_SEC, TimeUnit.SECONDS)
+                                                .maxMessagesPerPoll(MAX_MESSAGES_PER_POLL)))
                 .handle(retryFileHandler).get();
     }
-
 
 
     @Bean

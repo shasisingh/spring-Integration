@@ -11,7 +11,6 @@ import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.jms.JmsDestinationPollingSource;
 import org.springframework.integration.jms.dsl.Jms;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.core.JmsTemplate;
@@ -29,14 +28,14 @@ public class JmsConfiguration {
     @Value("${activemq.broker-urls:tcp://localhost:61616}")
     private String brokerUrl;
 
-    @Bean(name = "queueRetryHandler")
-    //message handler by Class
+    @Bean
     public IntegrationFlow queueRetryHandler(MessageSource<Object> jmsRetrySource, JmsMessageHandler messageHandler,
             JmsTransactionManager jmsTransactionManager) {
         return IntegrationFlows
                 .from(jmsRetrySource, configurer -> configurer.role(LEADER_ROLE)
                         .autoStartup(false)
-                        .poller(fixedDelay(1000, TimeUnit.MILLISECONDS)
+                        .poller(
+                                fixedDelay(1000, TimeUnit.MILLISECONDS)
                                 .receiveTimeout(1000L)
                                 .maxMessagesPerPoll(5)
                                 .transactional(jmsTransactionManager)))
@@ -46,33 +45,32 @@ public class JmsConfiguration {
 
 
 
-    //message handler by Queue
-    @Bean(name = "closeAccountNotification")
-    public IntegrationFlow flow(ConnectionFactory connectionFactory, JmsTransactionManager jmsTransactionManager) {
+    @Bean
+    public IntegrationFlow jmsBoundAdapter(ConnectionFactory connectionFactory, JmsTransactionManager jmsTransactionManager) {
         return IntegrationFlows
                 .from(Jms.inboundAdapter(getJmsTemplate(connectionFactory,"closeAccountListQueue")),
                         configurer -> configurer.role(LEADER_ROLE)
                                 .autoStartup(false)
                                 .poller(
-                                        Pollers.fixedDelay(10).maxMessagesPerPoll(2).transactional(jmsTransactionManager))
+                                        Pollers.fixedDelay(10)
+                                                .maxMessagesPerPoll(2)
+                                                .transactional(jmsTransactionManager))
                 )
-                .log("RECEIVED FROM closeAccountListQueue:")
                 .handle(Jms.outboundAdapter(getJmsTemplate(connectionFactory,"closeAccountNotification"))
                 )
                 .get();
     }
 
 
-
     @Bean
-    public MessageSource<Object> jmsRetrySource(JmsTemplate queueToLook) {
-        var messageSource = new JmsDestinationPollingSource(queueToLook);
-        messageSource.setDestination(queueToLook.getDefaultDestination());
+    public MessageSource<Object> jmsRetrySource(JmsTemplate newAccountQueue) {
+        var messageSource = new JmsDestinationPollingSource(newAccountQueue);
+        messageSource.setDestination(newAccountQueue.getDefaultDestination());
         return messageSource;
     }
 
-    @Bean("newAccountQueue")
-    public JmsTemplate queueToLook(ConnectionFactory connectionFactory) {
+    @Bean
+    public JmsTemplate newAccountQueue(ConnectionFactory connectionFactory) {
         return getJmsTemplate(connectionFactory, "newAccountQueue");
     }
 
@@ -95,8 +93,4 @@ public class JmsConfiguration {
     }
 
 
-    @JmsListener(destination = "closeAccountNotification")
-    public void listen(String in) {
-        System.out.println("closeAccountNotification=>"+in);
-    }
 }

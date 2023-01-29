@@ -3,40 +3,33 @@ package nl.shashi.playground.artemis;
 import javax.jms.JMSException;
 import java.util.stream.IntStream;
 
-/**
- * The type Write message.
- */
 public class WriteMessage {
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     * @throws JMSException the jms exception
-     */
-    public static void main(String[] args) throws JMSException {
+    public static void main(String[] args) {
+//        sendMessages(100, "", Queue.closeAccountListQueue);
+        sendMessages(100, "", Queue.newAccountQueue);
+    }
 
-        IntStream.range(1, 100).forEach(counter -> {
+    private static void sendMessages(int numberOfMessages, String message, Queue queue) {
+
+        IntStream.range(1, numberOfMessages + 1).forEach(counter -> {
             try {
-                JmsClient.send(counter + "==>" + testMessage(), "closeAccountListQueue");
+                if (message.isBlank()) {
+                    JmsClient.send(counter + "==>" + CustomDataFaker.starWars(), queue.name());
+                } else {
+                    JmsClient.send(counter + "==>" + message, queue.name());
+                }
             } catch (JMSException e) {
                 throw new RuntimeException(e);
             }
         });
-
-        IntStream.range(1, 100).forEach(counter -> {
-            try {
-                JmsClient.send(counter + "==>" + testMessage(), "newAccountQueue");
-            } catch (JMSException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
 
     }
 
-    private static String testMessage() {
-        return "{1:F01BICFOOYYAXXX8683497519}";
+    public enum Queue {
+        closeAccountListQueue,
+        newAccountQueue,
+        closeAccountNotification
     }
 
 }
