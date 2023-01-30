@@ -10,7 +10,8 @@ Spring Integration provides a lot of powerful components that can greatly enhanc
 * JDBC Polling using the Spring Integration DSL 
 * JMS Polling 
 * JMS to JMS Polling (inboundAdapter,outboundAdapter)
-* Leader Election 
+* File Polling
+* Leader Election
 
 ### Guides
 The following guides illustrate how to use some features concretely:

@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class JdbcConfiguration {
+public class JdbcPollerConfiguration {
 
     public static final String LEADER_ROLE = "leader";
     private static final int FIX_DELAY_IN_SEC = 10;

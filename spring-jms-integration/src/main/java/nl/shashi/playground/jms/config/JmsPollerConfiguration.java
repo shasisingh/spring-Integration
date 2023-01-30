@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import static org.springframework.integration.dsl.Pollers.fixedDelay;
 
 @Configuration
-public class JmsConfiguration {
+public class JmsPollerConfiguration {
 
     public static final String LEADER_ROLE = "leader";
 
